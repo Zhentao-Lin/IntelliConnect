@@ -178,30 +178,33 @@ ai:
   custom-key: XXX
   custom-llm-provider-url: XXX
   agent-epoch-limit: 5
-  chatTool-llm: silicon-Qwen/Qwen3-32B
+  chatTool-llm: dashscope-qwen3-235b-a22b-instruct-2507
   chatTool-speedUp: true
-  emotionTool-llm: silicon-Qwen/Qwen3-30B-A3B-think-no
-  memoryTool-llm: silicon-Qwen/Qwen2.5-32B-Instruct
-  classifierTool-llm: silicon-Qwen/Qwen3-Next-80B-A3B-Instruct
+  emotionTool-llm: dashscope-qwen2.5-14b-instruct
+  memoryTool-llm: dashscope-qwen2.5-32b-instruct
+  classifierTool-llm: dashscope-qwen3-next-80b-a3b-instruct
   classifierTool-speedUp: true
-  controlTool-llm: silicon-Qwen/Qwen3-Next-80B-A3B-Instruct
-  musicTool-llm: silicon-Qwen/Qwen2.5-14B-Instruct
-  productRoleTool-llm: silicon-Qwen/Qwen2.5-7B-Instruct
-  weatherTool-llm: silicon-Qwen/Qwen3-30B-A3B
+  controlTool-llm: dashscope-qwen2.5-32b-instruct
+  controlTool-llm-speed: true
+  musicTool-llm: dashscope-qwen2.5-14b-instruct
+  productRoleTool-llm: dashscope-qwen2.5-14b-instruct
+  weatherTool-llm: dashscope-qwen3-next-80b-a3b-instruct
   weatherTool-speedUp: true
-  wxBoundProductTool-llm: silicon-Qwen/Qwen2.5-14B-Instruct
-  wxProductActiveTool-llm: silicon-Qwen/Qwen2.5-14B-Instruct
-  scheduleTool-llm: silicon-Qwen/Qwen3-30B-A3B-think-128
-  searchTool-llm: silicon-Qwen/Qwen2.5-14B-Instruct
-  agent-llm: silicon-Qwen/Qwen3-235B-A22B-Instruct-2507
+  wxBoundProductTool-llm: dashscope-qwen2.5-14b-instruct
+  wxProductActiveTool-llm: dashscope-qwen2.5-14b-instruct
+  scheduleTool-llm: dashscope-qwen3-next-80b-a3b-instruct
+  searchTool-llm: silicon-Qwen3-30B-A3B-think-64
+  agent-llm: dashscope-qwen3-max
   agent-speedUp: true
-  longMemoryTool-llm: silicon-Qwen/Qwen2.5-14B-Instruct
+  longMemoryTool-llm: dashscope-qwen2.5-14b-instruct
   wx_smart_robot_llm: glm
-  knowledge_graphic_llm: silicon-Qwen/Qwen3-Next-80B-A3B-Instruct
+  knowledge_graphic_llm: dashscope-qwen3-30b-a3b-instruct-2507
   knowledge_graphic:
     max_graphic_length: 30000
+  branch-prediction:
+    enabled: true
   mcp:
-    agent-llm: silicon-Qwen/Qwen3-235B-A22B-Instruct-2507
+    agent-llm: dashscope-qwen3-max
     agent-speedUp: true
     agent-epoch-limit: 5
 jwt:

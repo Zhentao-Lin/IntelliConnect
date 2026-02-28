@@ -209,8 +209,15 @@ public class KnowledgeGraphicServiceImpl implements KnowledgeGraphicService {
     rootNode.setHitTimes(rootNode.getHitTimes() + 1);
     knowledgeGraphicNodeRepository.save(rootNode);
     KnowledgeGraphic knowledgeGraphic = new KnowledgeGraphic();
+
+    // Use Set to record visited node IDs for self-loop detection and deduplication
+    Set<Long> visitedNodeIds = new HashSet<>();
+
     Stack<KnowledgeGraphicNodeEntity> nodeStack = new Stack<>();
     List<KnowledgeGraphicNodeEntity> nodeList = new ArrayList<>();
+
+    // Add root node to visited set
+    visitedNodeIds.add(rootNode.getId());
     nodeList.add(rootNode);
     knowledgeGraphic.addNode(rootNode.getName(), rootNode.getDes());
     for (KnowledgeGraphicNodeEntity node : nodeList) {
@@ -227,7 +234,16 @@ public class KnowledgeGraphicServiceImpl implements KnowledgeGraphicService {
             knowledgeGraphicRelationRepository.getAllByFrom(node.getId());
         for (KnowledgeGraphicRelationEntity relation : relationList) {
           KnowledgeGraphicNodeEntity to = this.getNodeById(relation.getTo());
-          // Null is not on consideration, cause relation must with from and to
+
+          // Self-loop + deduplication, use contains() instead of == comparison
+          if (visitedNodeIds.contains(to.getId())) {
+            // Even if node is visited, relation still needs to be added (avoid losing edge info)
+            knowledgeGraphic.addRelation(node.getName(), relation.getDes(), to.getName());
+            continue;
+          }
+
+          // Mark this node as visited
+          visitedNodeIds.add(to.getId());
           nextNodeList.add(to);
           knowledgeGraphic.addRelation(node.getName(), relation.getDes(), to.getName());
         }

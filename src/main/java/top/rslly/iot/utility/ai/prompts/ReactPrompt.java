@@ -20,6 +20,7 @@
 package top.rslly.iot.utility.ai.prompts;
 
 
+import cn.hutool.core.date.ChineseDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -29,10 +30,8 @@ import top.rslly.iot.services.agent.ProductRoleServiceImpl;
 import top.rslly.iot.utility.ai.DescriptionUtil;
 import top.rslly.iot.utility.ai.promptTemplate.StringUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 public class ReactPrompt {
@@ -50,6 +49,7 @@ public class ReactPrompt {
           Your role is {role}, {role_introduction},your name is {agent_name},developed by the {team_name} team.
           The user's name is {user_name}
           The current concept of memory and its content: {memory_map}
+          The current time is {time}, Lunar date is {lunar_date}.
           As a diligent Task Agent, you goal is to effectively accomplish the provided task or question as best as you can.
 
           ## Tools
@@ -95,7 +95,7 @@ public class ReactPrompt {
           ## Attention
           - Your output is JSON only and no explanation.
           - Choose only ONE tool and you can't do without using any tools in one step.
-          - Thought use chinese,Your thoughts can be seen by users, please try to match the role as much as possible.
+          - Thought use Chinese,Your thoughts can be seen by users, please try to match the role as much as possible.
           - Your final answer and middle step output language should be consistent with the language used by the user.
           - Whether the action input is JSON or str depends on the definition of the tool.
           - Your final answer should match the role, and should be kept within 100 words as much as possible.
@@ -110,6 +110,13 @@ public class ReactPrompt {
 
   public String getReact(String toolDescriptions, String question, int productId) {
     Map<String, String> params = new HashMap<>();
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    Date date = new Date();
+    String formattedDate = formatter.format(date);
+    params.put("time", formattedDate);
+    // ========== 农历时间 ==========
+    String lunarDate = getLunarDateString(date);
+    params.put("lunar_date", lunarDate);
     params.put("memory_map", descriptionUtil.getAgentLongMemory(productId));
     params.put("tool_descriptions", toolDescriptions);
     params.put("question", question);
@@ -134,5 +141,26 @@ public class ReactPrompt {
     params.put("role_introduction", Objects.requireNonNullElse(roleIntroduction,
         "你可以回答新闻内容和用户的各种合法请求，你回答的每句话都尽量口语化、简短,总是喜欢使用表情符号"));
     return StringUtils.formatString(ReactSystem, params);
+  }
+
+  /**
+   * 使用 Hutool 获取农历日期字符串
+   *
+   * @param date 公历日期
+   * @return 农历日期字符串 例如：甲辰年腊月初五
+   */
+  private String getLunarDateString(Date date) {
+    try {
+      ChineseDate chineseDate = new ChineseDate(date);
+      // 天干地支年份 + 生肖 + 月 + 日
+      // 例如：甲辰年（龙年）腊月初五
+      return chineseDate.getCyclical() // 甲辰年
+          + "(" + chineseDate.getChineseZodiac() + "年)" // (龙年)
+          + chineseDate.getChineseMonthName() // 腊月
+          + chineseDate.getChineseDay() // 初五
+          + chineseDate.getFestivals(); // 节日
+    } catch (Exception e) {
+      return "";
+    }
   }
 }

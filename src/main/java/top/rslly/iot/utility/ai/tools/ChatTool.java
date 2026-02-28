@@ -96,8 +96,11 @@ public class ChatTool implements BaseTool<String> {
     // 初始化当前会话的锁和条件变量
     lockMap.putIfAbsent(chatId, new ReentrantLock());
     conditionMap.putIfAbsent(chatId, lockMap.get(chatId).newCondition());
-
-    List<AgentMemoryEntity> agentMemoryEntities = agentMemoryService.findAllByChatId(chatId);
+    String memoryChatId = chatId;
+    if (chatId.endsWith("_prediction")) {
+      memoryChatId = chatId.substring(0, chatId.length() - "_prediction".length());
+    }
+    List<AgentMemoryEntity> agentMemoryEntities = agentMemoryService.findAllByChatId(memoryChatId);
     String currentMemory = "";
     if (!agentMemoryEntities.isEmpty()) {
       currentMemory = agentMemoryEntities.get(0).getContent();
@@ -128,17 +131,10 @@ public class ChatTool implements BaseTool<String> {
     ModelMessage systemMessage =
         new ModelMessage(ModelMessageRole.SYSTEM.value(),
             chatToolPrompt.getChatTool(assistantName, userName, role, roleIntroduction,
-                currentMemory, information, memoryMap, knowledgeGraphic));
+                currentMemory, information, memoryMap, knowledgeGraphic, question));
     log.info(llmName);
-    log.info("systemMessage: {}", systemMessage.getContent());
     ModelMessage userMessage = new ModelMessage(ModelMessageRole.USER.value(), question);
-    if (!memory.isEmpty()) {
-      // messages.addAll(memory);
-      systemMessage.setContent(
-          chatToolPrompt.getChatTool(assistantName, userName, role, roleIntroduction, currentMemory,
-              information, memoryMap, knowledgeGraphic)
-              + memory);
-    }
+    // log.info("systemMessage: {}", systemMessage.getContent());
     messages.add(systemMessage);
     messages.add(userMessage);
     // log.info("chatTool: " + messages);
